@@ -66,7 +66,6 @@ public :
 
 ICar::IFactory *fac[3] = {new BenzCar::Factory(), new AudiCar::Factory(), new BmwCar::Factory()};
 
-
 int main() {
 	ICar *cars[10];
 	for (int i = 0; i < 10; i++) {
