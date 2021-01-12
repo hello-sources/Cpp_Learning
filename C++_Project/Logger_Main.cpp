@@ -7,8 +7,8 @@
  ************************************************************************/
 
 #include <iostream>
-#include "Logger.h"
-#include "Thread_Pool.h" 
+#include "logger.h"
+#include "thread_pool.h" 
 using namespace std;
 
 void func1() {
@@ -16,8 +16,8 @@ void func1() {
 	return ;
 }
 
-void func2(haizei::Logger &log) {
-	log() << "1" << "2" << "3" << "4" << "5" << "6";
+void func2() {
+	LOG_TRACE << "1" << "2" << "3" << "4" << "5" << "6";
 	return ;
 }
 
@@ -32,9 +32,8 @@ int main() {
 	cout << "cout done" << endl;
 	cout.flush();
 	tp.start();
-	haizei::Logger log;
 	for (int i = 1; i <= 20; i++) {
-		tp.add_one_task(func2, ref(log));
+		tp.add_one_task(func2);
 	}
 	std::this_thread::sleep_for(std::chrono::seconds(2));
 	tp.stop();
