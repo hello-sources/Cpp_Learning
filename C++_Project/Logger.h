@@ -12,8 +12,16 @@
 #include <iostream>
 #include <sstream>
 #include <mutex>
+#include <map>
+#include <string>
 
-#define LOG_TRACE haizei::haizei_log(__FILE__, __func__, __LINE__)
+#define LOG_TRACE(level) haizei::haizei_log(__FILE__, __func__, __LINE__, level)
+#define LOG_INFO LOG_TRACE(haizei::LogLevel::INFO)
+#define LOG_DEBUG LOG_TRACE(haizei::LogLevel::DEBUG)
+#define LOG_WARN LOG_TRACE(haizei::LogLevel::WARN)
+#define LOG_ERROR LOG_TRACE(haizei::LogLevel::ERROR)
+#define LOG_SET(levels) haizei::Logger::set_level(levels)
+
 
 namespace haizei {
 
@@ -36,6 +44,26 @@ private:
 };
 */
 
+class LogLevel {
+public : 
+	static const int INFO;
+	static const int DEBUG;
+	static const int WARN;
+	static const int ERROR;
+};
+
+const int LogLevel::INFO = 1;
+const int LogLevel::DEBUG = 2;
+const int LogLevel::WARN = 4;
+const int LogLevel::ERROR = 8;
+
+std::map<int, std::string> LogLevelStr = {
+	{LogLevel::INFO, "INFO"},
+	{LogLevel::DEBUG, "DEBUG"},
+	{LogLevel::WARN, "WARN"},
+	{LogLevel::ERROR, "ERROR"}
+};
+
 class Logger {
     class LoggerStream : public std::ostringstream {
     public :
@@ -43,18 +71,21 @@ class Logger {
 			const char *file_name,
 			const char *func_name,
 			int line_no,
-			Logger &raw_obj) : 
+			Logger &raw_obj,
+			int l
+			) : 
 			raw_obj(raw_obj), 
-			file_name(file_name),
-			func_name(func_name),
-			line_no(line_no) {
+			line_no(line_no),
+			flag(1) {
 				std::ostringstream &now = *this;
             	now << "[" << file_name << "project]";
             	now << " [" << func_name << "] ";
+            	now << " [" << LogLevelStr[l] << "] ";
+            	flag = Logger::logger_level_conf & l;
 			}
         LoggerStream(const LoggerStream &ls) : raw_obj(ls.raw_obj) {}
         ~LoggerStream() {
-            output();
+            if (flag) output();
         }
     private:
         void output() {
@@ -66,17 +97,22 @@ class Logger {
             return ;
         }
         Logger &raw_obj;
-        const char *file_name;
-        const char *func_name;
-        int line_no; 
+        int line_no, flag;      
     };
 public :
-    LoggerStream operator()(const char *file_name, const char *func_name, int line_no) {
-        return LoggerStream(file_name, func_name, line_no, *this);
+    LoggerStream operator()(const char *file_name, const char *func_name, int line_no, int l) {
+        return LoggerStream(file_name, func_name, line_no, *this, l);
     }
+	static void set_level(int levels) {
+		Logger::logger_level_conf = levels;
+		return ;
+	}
 private:
     std::mutex m_mutex;
+    static int logger_level_conf; 
 };
+
+int Logger::logger_level_conf = 0;
 
 Logger haizei_log;
 
