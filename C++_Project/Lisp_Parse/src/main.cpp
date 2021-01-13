@@ -1,9 +1,9 @@
 
-#include "../include/handler.h"
-#include "../include/utility.h"
-#include "../include/Visitor.h"
-#include "../include/Expr.h"
-#include "../include/Parser.h"
+#include "handler.h"
+#include "utility.h"
+#include "Visitor.h"
+#include "Expr.h"
+#include "Parser.h"
 #include <string>
 #include <cstdlib>
 #include <memory>

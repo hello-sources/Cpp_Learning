@@ -1,4 +1,4 @@
-#include "../include/Parser.h"
+#include "Parser.h"
 shared_ptr<Expr> Parse(const char*& expression, ExprHandler* handler)
 {
 	const char* Read = expression;
